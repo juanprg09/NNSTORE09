@@ -1,0 +1,1459 @@
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nnshop - Tienda de moda</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color:#111;
+    background:#fff;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: #111;
+    position: relative;
+  }
+  header .logo {
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.8rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    cursor: pointer;
+  }
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+  }
+  nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: color 0.3s;
+  }
+  nav ul li a:hover {
+    color: #e63946;
+  }
+
+  /* Carrito de compra */
+  #cartIcon {
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    margin-left: 20px;
+  }
+  #cartIcon:hover {
+    color: #e63946;
+  }
+  #cartPanel {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 40px;
+    background: #fff;
+    border: 1px solid #ccc;
+    width: 320px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    z-index: 1000;
+  }
+  #cartPanel h4 {
+    margin-bottom: 10px;
+    font-weight: 700;
+    color: #111;
+  }
+  #cartItems {
+    list-style: none;
+    max-height: 240px;
+    overflow-y: auto;
+    padding-left: 0;
+    margin-bottom: 15px;
+  }
+  #cartItems li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 1rem;
+    color: #333;
+  }
+  #cartItems button {
+    background: #e63946;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    transition: background 0.3s;
+  }
+  #cartItems button:hover {
+    background: #b42c3c;
+  }
+  #buyAllBtn {
+    width: 100%;
+    background: #0d6efd;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  #buyAllBtn:hover {
+    background: #084cd9;
+  }
+
+  section {
+    padding: 50px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: none;
+  }
+  section.active {
+    display: block;
+  }
+  h2 {
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 35px;
+    text-align: center;
+  }
+  .products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+    gap: 40px;
+  }
+  .product-card {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    background: #fff;
+  }
+  .product-card:hover {
+    transform: scale(1.05);
+  }
+  .product-card img {
+    width: 100%;
+    display: block;
+  }
+  .product-info {
+    padding: 20px;
+    text-align: center;
+  }
+  .product-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+    color: #111;
+  }
+  .product-info p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 15px;
+  }
+  .price {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #e63946;
+  }
+  .product-info button.buyBtn, 
+  .product-info button.addToCartBtn {
+    background: #0d6efd;
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin: 5px 10px 0 10px;
+  }
+  .product-info button.buyBtn:hover,
+  .product-info button.addToCartBtn:hover {
+    background: #084cd9;
+  }
+  /* Tamaño select */
+  .size-select {
+    margin-top: 10px;
+    font-weight: 600;
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1.5px solid #ccc;
+    font-size: 1rem;
+  }
+
+  footer {
+    background-color: #111;
+    color: #aaa;
+    text-align: center;
+    padding: 25px;
+    margin-top: 80px;
+    font-size: 0.9rem;
+  }
+
+  /* Modal / formulario individual */
+  #formModal {
+    position: fixed;
+    top: 0;
+    left:0;
+    right:0;
+    bottom:0;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+  }
+  #formModal.active {
+    display: flex;
+  }
+  #purchaseForm {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.25);
+    position: relative;
+  }
+  #purchaseForm h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #0d6efd;
+  }
+  #purchaseForm label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  #purchaseForm input, #purchaseForm select {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 15px;
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+  #purchaseForm input:focus, #purchaseForm select:focus {
+    border-color: #0d6efd;
+    outline: none;
+  }
+  #purchaseForm input[readonly] {
+    background: #e9ecef;
+    cursor: default;
+  }
+  #purchaseForm button[type="submit"] {
+    background: #0d6efd;
+    border: none;
+    color: white;
+    width: 100%;
+    padding: 12px 0;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  #purchaseForm button[type="submit"]:hover {
+    background: #084cd9;
+  }
+  #closeForm {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: #333;
+    cursor: pointer;
+  }
+
+  /* Modal carrito pago */
+  #cartCheckoutModal {
+    display:none;
+    position: fixed;
+    top: 0;
+    left:0;
+    right:0;
+    bottom:0;
+    background: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+    z-index: 11000;
+  }
+  #cartCheckoutModal.active {
+    display:flex;
+  }
+  #cartCheckoutContent {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.25);
+    position: relative;
+  }
+  #cartCheckoutContent h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #0d6efd;
+  }
+  #cartProductsList p {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: #111;
+  }
+  #cartCheckoutContent label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  #cartCheckoutContent input, #cartCheckoutContent select {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 15px;
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+  #cartCheckoutContent input:focus, #cartCheckoutContent select:focus {
+    border-color: #0d6efd;
+    outline: none;
+  }
+  #closeCartPayment {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: #333;
+    cursor: pointer;
+  }
+  #cartCheckoutContent button[type="submit"] {
+    background: #0d6efd;
+    border: none;
+    color: white;
+    width: 100%;
+    padding: 12px 0;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  #cartCheckoutContent button[type="submit"]:hover {
+    background: #084cd9;
+  }
+
+  /* Mensaje añadido */
+  #msgAdded {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #0d6efd;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+    z-index: 15000;
+    font-weight: 700;
+  }
+
+  @media(max-width:600px) {
+    header {
+      flex-direction: column;
+      gap: 15px;
+      padding: 20px;
+    }
+    nav ul {
+      gap: 15px;
+    }
+    section {
+      padding: 30px 20px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">NNSHOP</div>
+  <div id="cartIcon" title="Ver carrito">🛒 Carrito (<span id="cartCount">0</span>)</div>
+  <nav>
+    <ul>
+      <li><a href="#home" class="nav-link">HOME</a></li>
+      <li><a href="#nuevos" class="nav-link">TENIS DE HOMBRES</a></li>
+      <li><a href="#hombre" class="nav-link">RELOJ DE HOMBRE</a></li>
+      <li><a href="#mujer" class="nav-link">PERFUMES DE HOMBRE</a></li>
+      <li><a href="#ofertas" class="nav-link">CAMISAS DE HOMBRE</a></li>
+    </ul>
+  </nav>
+  <div id="cartPanel">
+    <h4>Productos en el carrito:</h4>
+    <ul id="cartItems"></ul>
+    <button id="buyAllBtn">Comprar Todo</button>
+  </div>
+</header>
+
+<section id="home" class="active" style="background: linear-gradient(135deg, #1a3c72, #2a5298); color: #fff; padding: 80px 40px; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); margin: 40px auto; max-width: 1100px; text-align: center;">
+  <h2 style="font-size: 3rem; font-weight: 800; margin-bottom: 20px; text-shadow: 2px 2px 8px rgba(0,0,0,0.3);">
+    Bienvenido a NNSHOP
+  </h2>
+  <p style="font-size: 1.2rem; max-width: 700px; margin: 0 auto 35px auto; line-height: 1.6; text-shadow: 1px 1px 5px rgba(0,0,0,0.2);">
+    Explora nuestra tienda con la mejor selección de tenis, relojes, perfumes y camisas para todas la edades! Calidad y estilo en cada compra!
+  </p>
+  <button id="btnContactanos" style="background: #fff; color: #1a3c72; font-weight: 700; padding: 15px 30px; border-radius: 50px; font-size: 1.1rem; border: none; cursor: pointer;">
+    Contáctanos
+  </button>
+
+  <section id="formContacto" style="display:none; max-width: 600px; margin: 40px auto; padding: 30px; background: #f9f9f9; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
+    <h2 style="color: #1a3c72; font-weight: 800; margin-bottom: 20px; text-align: center;">
+      Formulario de Contacto
+    </h2>
+    <form><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d673.4084049541698!2d-109.91919893771407!3d27.585546183189173!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x86cc6d0eac26b2b7%3A0x882ec9627b0d3361!2sCECyTES%20Plantel%20Esperanza!5e1!3m2!1ses-419!2smx!4v1761262751730!5m2!1ses-419!2smx" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <style>
+        #formContacto label {
+          color: #0d6efd; /* Azul */
+          font-weight: 600;
+        }
+      </style>
+      <div style="margin-bottom: 15px;">
+        <label for="instagram">Instagram</label>
+        <a href="https://www.instagram.com/nnshopmx09" target="_blank" style="color: #E1306C; margin-left: 10px;">nnshopmx09</a>
+      </div>
+      <div style="margin-bottom: 15px;">
+        <label for="email" style="display: block;">Correo Electrónico</label>
+        <input type="email" id="email" name="email" placeholder="NNSHOPMX0919@gmail.com" style="width: 100%; padding: 8px; border-radius: 8px; border: 1.5px solid #ccc;" readonly>
+      </div>
+      <div style="margin-bottom: 15px;">
+        <label for="telefono">Número Telefónico</label>
+        <input type="tel" id="telefono" name="telefono" placeholder="6442252598" style="width: 100%; padding: 8px; border-radius: 8px; border: 1.5px solid #ccc;" readonly>
+      </div>
+      <div style="margin-bottom: 15px;">
+        <label for="direccion">Dirección de oficinas</label>
+        <textarea id="direccion" name="direccion" rows="3" style="width: 100%; padding: 8px; border-radius: 8px; border: 1.5px solid #ccc;" readonly>Cecytes Esperanza, Comisaría de Esperanza, Cd. Obregón, Sonora.</textarea>
+      </div>
+    </form>
+  </section>
+</section>
+
+<section id="formContacto" style="max-width: 600px; margin: 40px auto; padding: 30px; background:#f9f9f9; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); display:none;">
+  <h2 style="color:#1a3c72; font-weight: 800; margin-bottom: 20px; text-align:center;">Formulario de Contacto</h2>
+  <form>
+    <div style="margin-bottom: 15px;">
+      <label for="instagram" style="font-weight: 600;">Instagram:</label>
+      <a href="https://www.instagram.com/nnshopmx_09/" target="_blank" style="color: #E1306C; margin-left: 10px;">@nnshopmx_09</a>
+    </div>
+    <div style="margin-bottom: 15px;">
+      <label for="email" style="display:block; font-weight: 600;">Correo Electrónico:</label>
+      <input type="email" id="email" name="email" placeholder="NNSHOPMX0919@gmail.com" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc;" readonly />
+    </div>
+    <div style="margin-bottom: 15px;">
+      <label for="telefono" style="font-weight: 600;">Número Telefónico:</label>
+      <input type="tel" id="telefono" name="telefono" placeholder="6442252598" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc;" readonly />
+    </div>
+    <div style="margin-bottom: 15px;">
+      <label for="direccion" style="font-weight: 600;">Dirección de oficinas:</label>
+      <textarea id="direccion" name="direccion" rows="3" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc;" readonly>Cecytes Esperanza, Comisaría de Esperanza, Cd. Obregón, Sonora.</textarea>
+    </div>
+  </form>
+</section>
+
+<section id="nuevos">
+  <h2>Tenis De Hombres</h2>
+  <div class="products" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; justify-items: center;">
+    <div class="product-card" data-name="Air Jordan 1 Mid" data-price="4200" data-type="tenis">
+      <img src="C:\Users\Dell\Desktop\jordan1m.png" alt="Air Jordan 1 Mid" />
+      <div class="product-info">
+        <h3>Air Jordan 1 Mid</h3>
+        <p>Color clásico y diseño icónico para destacar donde vayas.</p>
+        <div class="price">$4,200 MXN</div>
+        <label for="sizeSelectAj1">Talla:</label>
+        <select class="size-select" id="sizeSelectAj1" aria-label="Talla Air Jordan 1 Mid">
+          <option value="">Selecciona talla</option>
+          <option value="23">23</option>
+          <option value="24">24</option>
+          <option value="25">25</option>
+          <option value="26">26</option>
+          <option value="27">27</option>
+          <option value="27.5">27.5</option>
+          <option value="28">28</option>
+          <option value="29">29</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-name="Nike Dunk Low Retro" data-price="3900" data-type="tenis">
+      <img src="C:\Users\Dell\Desktop\nikedunk.png" alt="Nike Dunk Low Retro" />
+      <div class="product-info">
+        <h3>Nike Dunk Low Retro</h3>
+        <p>Inspirado en los clásicos del básquet, con estilo urbano.</p>
+        <div class="price">$3,900 MXN</div>
+        <label for="sizeSelectNikeDunk">Talla:</label>
+        <select class="size-select" id="sizeSelectNikeDunk" aria-label="Talla Nike Dunk Low Retro">
+          <option value="">Selecciona talla</option>
+          <option value="23">23</option>
+          <option value="24">24</option>
+          <option value="25">25</option>
+          <option value="26">26</option>
+          <option value="27">27</option>
+          <option value="27.5">27.5</option>
+          <option value="28">28</option>
+          <option value="29">29</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-name="Nike air force 1" data-price="3200" data-type="tenis">
+      <img src="C:\Users\Dell\Desktop\nikeforce1.png" alt="Nike air force 1" />
+      <div class="product-info">
+        <h3>Nike Air force 1</h3>
+        <p>Estilo retro con materiales premium y gran comodidad.</p>
+        <div class="price">$3,200 MXN</div>
+        <label>Talla:</label>
+        <select class="size-select" aria-label="Talla Nike Air force 1">
+          <option value="">Selecciona talla</option>
+          <option value="23">23</option>
+          <option value="24">24</option>
+          <option value="25">25</option>
+          <option value="26">26</option>
+          <option value="27">27</option>
+          <option value="27.5">27.5</option>
+          <option value="28">28</option>
+          <option value="29">29</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-name="Nike air max 270" data-price="3500" data-type="tenis">
+      <img src="C:\Users\Dell\Desktop\nike270.png" alt="Nike air max 270" />
+      <div class="product-info">
+        <h3>Nike Air max 270</h3>
+        <p>Diseño moderno con colores vibrantes y máxima amortiguación.</p>
+        <div class="price">$3,500 MXN</div>
+        <label>Talla:</label>
+        <select class="size-select" aria-label="Talla Nike Air max 270">
+          <option value="">Selecciona talla</option>
+          <option value="23">23</option>
+          <option value="24">24</option>
+          <option value="25">25</option>
+          <option value="26">26</option>
+          <option value="27">27</option>
+          <option value="27.5">27.5</option>
+          <option value="28">28</option>
+          <option value="29">29</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-name="Nike Metcon 6" data-price="3800" data-type="tenis">
+      <img src="C:\Users\Dell\Desktop\metcon.png" alt="Nike Metcon 6" />
+      <div class="product-info">
+        <h3>Nike Metcon 6</h3>
+        <p>Maximo soporte y flexibilidad para tus entrenamientos intensos</p>
+        <div class="price">$3,800 MXN</div>
+        <label>Talla:</label>
+        <select class="size-select" aria-label="Talla Nike Metcon 6">
+          <option value="">Selecciona talla</option>
+          <option value="23">23</option>
+          <option value="24">24</option>
+          <option value="25">25</option>
+          <option value="26">26</option>
+          <option value="27">27</option>
+          <option value="27.5">27.5</option>
+          <option value="28">28</option>
+          <option value="29">29</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-name="New Balance 530" data-price="3800" data-type="tenis">
+      <img src="C:\Users\Dell\Desktop\newbalance.png" alt="New Balance 530" />
+      <div class="product-info">
+        <h3>New Balance 530</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$3,800 MXN</div>
+        <label>Talla:</label>
+        <select class="size-select" aria-label="Talla New Balance 530">
+          <option value="">Selecciona talla</option>
+          <option value="23">23</option>
+          <option value="24">24</option>
+          <option value="25">25</option>
+          <option value="26">26</option>
+          <option value="27">27</option>
+          <option value="27.5">27.5</option>
+          <option value="28">28</option>
+          <option value="29">29</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-name="Air Jordan 4 Retro" data-price="3800" data-type="tenis">
+      <img src="C:\Users\Dell\Desktop\JORDAN4.png" alt="Air Jordan 4 Retro" />
+      <div class="product-info">
+        <h3>Air Jordan 4 Retro</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$3,800 MXN</div>
+        <label>Talla:</label>
+        <select class="size-select" aria-label="Talla Air Jordan 4 Retro">
+          <option value="">Selecciona talla</option>
+          <option value="23">23</option>
+          <option value="24">24</option>
+          <option value="25">25</option>
+          <option value="26">26</option>
+          <option value="27">27</option>
+          <option value="27.5">27.5</option>
+          <option value="28">28</option>
+          <option value="29">29</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-name="Nike Air Max DN8" data-price="3800" data-type="tenis">
+      <img src="C:\Users\Dell\Desktop\DNO.png" alt="Nike Air Max DN8" />
+      <div class="product-info">
+        <h3>Nike Air Max DN8</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$3,800 MXN</div>
+        <label>Talla:</label>
+        <select class="size-select" aria-label="Talla Nike Air Max DN8">
+          <option value="">Selecciona talla</option>
+          <option value="23">23</option>
+          <option value="24">24</option>
+          <option value="25">25</option>
+          <option value="26">26</option>
+          <option value="27">27</option>
+          <option value="27.5">27.5</option>
+          <option value="28">28</option>
+          <option value="29">29</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-name="Adidas Ultraboost 5X" data-price="3800" data-type="tenis">
+      <img src="C:\Users\Dell\Desktop\ultraadidas.png" alt="Adidas Ultraboost 5X" />
+      <div class="product-info">
+        <h3>Adidas Ultraboost 5X</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$3,800 MXN</div>
+        <label>Talla:</label>
+        <select class="size-select" aria-label="Talla Adidas Ultraboost 5X">
+          <option value="">Selecciona talla</option>
+          <option value="23">23</option>
+          <option value="24">24</option>
+          <option value="25">25</option>
+          <option value="26">26</option>
+          <option value="27">27</option>
+          <option value="27.5">27.5</option>
+          <option value="28">28</option>
+          <option value="29">29</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-name="Nike Air Max 95" data-price="3800" data-type="tenis">
+      <img src="C:\Users\Dell\Desktop\nike95.png" alt="Nike Air Max 95" />
+      <div class="product-info">
+        <h3>Nike Air Max 95</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$3,800 MXN</div>
+        <label>Talla:</label>
+        <select class="size-select" aria-label="Talla Nike Air Max 95">
+          <option value="">Selecciona talla</option>
+          <option value="23">23</option>
+          <option value="24">24</option>
+          <option value="25">25</option>
+          <option value="26">26</option>
+          <option value="27">27</option>
+          <option value="27.5">27.5</option>
+          <option value="28">28</option>
+          <option value="29">29</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="hombre">
+  <h2>Reloj De Hombre</h2>
+  <div class="products" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; justify-items: center;">
+    <div class="product-card" data-name="Vacheron Constantin Overseas" data-price="400000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\vacheron.png" alt="Vacheron Constantin Overseas" />
+      <div class="product-info">
+        <h3>Vacheron Constantin Overseas</h3>
+        <p>Color clásico y diseño icónico para destacar donde vayas.</p>
+        <div class="price">$400,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="Patek Philippe Calatrava" data-price="450000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\calatrava.png" alt="Patek Philippe Calatrava" />
+      <div class="product-info">
+        <h3>Patek Philippe Calatrava</h3>
+        <p>Inspirado en los clásicos del básquet, con estilo urbano.</p>
+        <div class="price">$450,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="Audemars Piguet Royal Oak" data-price="630000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\piguet.png" alt="Audemars Piguet Royal Oak" />
+      <div class="product-info">
+        <h3>Audemars Piguet Royal Oak</h3>
+        <p>Estilo retro con materiales premium y gran comodidad.</p>
+        <div class="price">$630,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="Breitling Navitimer" data-price="160000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\breitling.png" alt="Breitling Navitimer" />
+      <div class="product-info">
+        <h3>Breitling Navitimer</h3>
+        <p>Diseño moderno con colores vibrantes y máxima amortiguación.</p>
+        <div class="price">$160,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="TAG Heuer Monaco" data-price="133000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\tag.png" alt="TAG Heuer Monaco" />
+      <div class="product-info">
+        <h3>TAG Heuer Monaco</h3>
+        <p>Maximo soporte y flexibilidad para tus entrenamientos intensos</p>
+        <div class="price">$133,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="IWC Big Pilot" data-price="160000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\IWC.png" alt="IWC Big Pilot" />
+      <div class="product-info">
+        <h3>IWC Big Pilot</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$160,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="Rolex Submariner (HULK)" data-price="420000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\submariner.png" alt="Rolex Submariner (HULK)" />
+      <div class="product-info">
+        <h3>Rolex Submariner (HULK)</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$420,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="Jaeger-LeCoultre Reverso" data-price="340000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\jaeger.png" alt="Jaeger-LeCoultre Reverso" />
+      <div class="product-info">
+        <h3>Jaeger-LeCoultre Reverso</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$340,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="Panerai Luminor Marina" data-price="100000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\panerai.png" alt="Panerai Luminor Marina" />
+      <div class="product-info">
+        <h3>Panerai Luminor Marina</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$100,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="Omega Speedmaster Professional" data-price="105000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\omega.png" alt="Omega Speedmaster Professional" />
+      <div class="product-info">
+        <h3>Omega Speedmaster Professional</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$105,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="mujer">
+  <h2>Perfumes De Hombre</h2>
+  <div class="products" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; justify-items: center;">
+    <div class="product-card" data-name="Dior Sauvage Eau de Parfum" data-price="400000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\dior.png" alt="Dior Sauvage Eau de Parfum" />
+      <div class="product-info">
+        <h3>Dior Sauvage Eau de Parfum</h3>
+        <p>Color clásico y diseño icónico para destacar donde vayas.</p>
+        <div class="price">$400,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="Versace Eros" data-price="450000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\versace.png" alt="Versace Eros" />
+      <div class="product-info">
+        <h3>Versace Eros</h3>
+        <p>Inspirado en los clásicos del básquet, con estilo urbano.</p>
+        <div class="price">$450,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="Yves Saint Laurent Y Eau de Parfum" data-price="630000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\yes.png" alt="Yves Saint Laurent Y Eau de Parfum" />
+      <div class="product-info">
+        <h3>Yves Saint Laurent Y Eau de Parfum</h3>
+        <p>Estilo retro con materiales premium y gran comodidad.</p>
+        <div class="price">$630,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="Jean Paul Gaultier LeMale LeParfum" data-price="160000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\jeanblack.png" alt="Jean Paul Gaultier LeMale LeParfum" />
+      <div class="product-info">
+        <h3>Jean Paul Gaultier LeMale LeParfum</h3>
+        <p>Diseño moderno con colores vibrantes y máxima amortiguación.</p>
+        <div class="price">$160,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="Paco Rabanne Invictus Victory Elixir" data-price="133000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\pacorab.png" alt="Paco Rabanne Invictus Victory Elixir" />
+      <div class="product-info">
+        <h3>Paco Rabanne Invictus Victory Elixir</h3>
+        <p>Maximo soporte y flexibilidad para tus entrenamientos intensos</p>
+        <div class="price">$133,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="Azzaro TheMostWanted Intense" data-price="160000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\azaro.png" alt="Azzaro TheMostWanted Intense" />
+      <div class="product-info">
+        <h3>Azzaro TheMostWanted Intense</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$160,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="Jean Paul Gaultier LeBeau LeParfum" data-price="420000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\lebe.png" alt="Jean Paul Gaultier LeBeau LeParfum" />
+      <div class="product-info">
+        <h3>Jean Paul Gaultier LeBeau LeParfum</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$420,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="ArmafOdysseyMandarinSky" data-price="340000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\sky.png" alt="ArmafOdysseyMandarinSky" />
+      <div class="product-info">
+        <h3>ArmafOdysseyMandarinSky</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$340,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="Tom Ford Noir Extreme" data-price="100000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\tom.png" alt="Tom Ford Noir Extreme" />
+      <div class="product-info">
+        <h3>Tom Ford Noir Extreme</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$100,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="Creed Aventus" data-price="105000" data-type="general">
+      <img src="C:\Users\Dell\Desktop\Creed.png" alt="Creed Aventus" />
+      <div class="product-info">
+        <h3>Creed Aventus</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$105,000 MXN</div>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ofertas">
+  <h2>Camisas de Hombre</h2>
+  <div class="products" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; justify-items: center;">
+    <div class="product-card" data-name="SKY 1" data-price="400000" data-type="camisa">
+      <img src="C:\Users\Dell\Desktop\sky1.png" alt="SKY 1" />
+      <div class="product-info">
+        <h3>SKY 1</h3>
+        <p>Color clásico y diseño icónico para destacar donde vayas.</p>
+        <div class="price">$400,000 MXN</div>
+        <label for="shirtSizeSky1">Talla camisa:</label>
+        <select class="size-select" id="shirtSizeSky1" aria-label="Talla Camisa SKY 1">
+          <option value="">Selecciona talla</option>
+          <option value="SM">SM</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="G">G</option>
+          <option value="XL">XL</option>
+          <option value="XXL">XXL</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="SKY 2" data-price="450000" data-type="camisa">
+      <img src="C:\Users\Dell\Desktop\sky2.png" alt="SKY 2" />
+      <div class="product-info">
+        <h3>SKY 2</h3>
+        <p>Inspirado en los clásicos del básquet, con estilo urbano.</p>
+        <div class="price">$450,000 MXN</div>
+        <label for="shirtSizeSky2">Talla camisa:</label>
+        <select class="size-select" id="shirtSizeSky2" aria-label="Talla Camisa SKY 2">
+          <option value="">Selecciona talla</option>
+          <option value="SM">SM</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="G">G</option>
+          <option value="XL">XL</option>
+          <option value="XXL">XXL</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="DROP 1" data-price="630000" data-type="camisa">
+      <img src="C:\Users\Dell\Desktop\drop1.png" alt="DROP 1" />
+      <div class="product-info">
+        <h3>DROP 1</h3>
+        <p>Estilo retro con materiales premium y gran comodidad.</p>
+        <div class="price">$630,000 MXN</div>
+        <label for="shirtSizeDrop1">Talla camisa:</label>
+        <select class="size-select" id="shirtSizeDrop1" aria-label="Talla Camisa DROP 1">
+          <option value="">Selecciona talla</option>
+          <option value="SM">SM</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="G">G</option>
+          <option value="XL">XL</option>
+          <option value="XXL">XXL</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="DROP 2" data-price="160000" data-type="camisa">
+      <img src="C:\Users\Dell\Desktop\drop2.png" alt="DROP 2" />
+      <div class="product-info">
+        <h3>DROP 2</h3>
+        <p>Diseño moderno con colores vibrantes y máxima amortiguación.</p>
+        <div class="price">$160,000 MXN</div>
+        <label for="shirtSizeDrop2">Talla camisa:</label>
+        <select class="size-select" id="shirtSizeDrop2" aria-label="Talla Camisa DROP 2">
+          <option value="">Selecciona talla</option>
+          <option value="SM">SM</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="G">G</option>
+          <option value="XL">XL</option>
+          <option value="XXL">XXL</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="DROP 3" data-price="133000" data-type="camisa">
+      <img src="C:\Users\Dell\Desktop\drop3.png" alt="DROP 3" />
+      <div class="product-info">
+        <h3>DROP 3</h3>
+        <p>Maximo soporte y flexibilidad para tus entrenamientos intensos</p>
+        <div class="price">$133,000 MXN</div>
+        <label for="shirtSizeDrop3">Talla camisa:</label>
+        <select class="size-select" id="shirtSizeDrop3" aria-label="Talla Camisa DROP 3">
+          <option value="">Selecciona talla</option>
+          <option value="SM">SM</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="G">G</option>
+          <option value="XL">XL</option>
+          <option value="XXL">XXL</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="DROP 4" data-price="160000" data-type="camisa">
+      <img src="C:\Users\Dell\Desktop\drop4.png" alt="DROP 4" />
+      <div class="product-info">
+        <h3>DROP 4</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$160,000 MXN</div>
+        <label for="shirtSizeDrop4">Talla camisa:</label>
+        <select class="size-select" id="shirtSizeDrop4" aria-label="Talla Camisa DROP 4">
+          <option value="">Selecciona talla</option>
+          <option value="SM">SM</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="G">G</option>
+          <option value="XL">XL</option>
+          <option value="XXL">XXL</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="DROP 5" data-price="420000" data-type="camisa">
+      <img src="C:\Users\Dell\Desktop\drop5.png" alt="DROP 5" />
+      <div class="product-info">
+        <h3>DROP 5</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$420,000 MXN</div>
+        <label for="shirtSizeDrop5">Talla camisa:</label>
+        <select class="size-select" id="shirtSizeDrop5" aria-label="Talla Camisa DROP 5">
+          <option value="">Selecciona talla</option>
+          <option value="SM">SM</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="G">G</option>
+          <option value="XL">XL</option>
+          <option value="XXL">XXL</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="DROP 6" data-price="340000" data-type="camisa">
+      <img src="C:\Users\Dell\Desktop\drop6.png" alt="DROP 6" />
+      <div class="product-info">
+        <h3>DROP 6</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$340,000 MXN</div>
+        <label for="shirtSizeDrop6">Talla camisa:</label>
+        <select class="size-select" id="shirtSizeDrop6" aria-label="Talla Camisa DROP 6">
+          <option value="">Selecciona talla</option>
+          <option value="SM">SM</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="G">G</option>
+          <option value="XL">XL</option>
+          <option value="XXL">XXL</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="DROP 7" data-price="100000" data-type="camisa">
+      <img src="C:\Users\Dell\Desktop\drop7.png" alt="DROP 7" />
+      <div class="product-info">
+        <h3>DROP 7</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$100,000 MXN</div>
+        <label for="shirtSizeDrop7">Talla camisa:</label>
+        <select class="size-select" id="shirtSizeDrop7" aria-label="Talla Camisa DROP 7">
+          <option value="">Selecciona talla</option>
+          <option value="SM">SM</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="G">G</option>
+          <option value="XL">XL</option>
+          <option value="XXL">XXL</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+    <div class="product-card" data-name="DROP 8" data-price="105000" data-type="camisa">
+      <img src="C:\Users\Dell\Desktop\drop8.png" alt="DROP 8" />
+      <div class="product-info">
+        <h3>DROP 8</h3>
+        <p>Diseño vintage con una combinación perfecta de estilo y confort.</p>
+        <div class="price">$105,000 MXN</div>
+        <label for="shirtSizeDrop8">Talla camisa:</label>
+        <select class="size-select" id="shirtSizeDrop8" aria-label="Talla Camisa DROP 8">
+          <option value="">Selecciona talla</option>
+          <option value="SM">SM</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="G">G</option>
+          <option value="XL">XL</option>
+          <option value="XXL">XXL</option>
+        </select>
+        <button class="buyBtn">Comprar</button>
+        <button class="addToCartBtn">Añadir al carrito</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal / formulario individual -->
+<div id="formModal">
+  <form id="purchaseForm">
+    <button type="button" id="closeForm">&times;</button>
+    <h2>Comprar Producto</h2>
+    <label for="productName">Producto</label>
+    <input type="text" id="productName" name="productName" readonly />
+    <label for="productPrice">Precio</label>
+    <input type="text" id="productPrice" name="productPrice" readonly />
+    <div id="sizeContainerIndividual" style="display:none;">
+      <label for="sizeIndividual">Talla / Medida</label>
+      <select id="sizeIndividual" name="sizeIndividual" required></select>
+    </div>
+    <label for="buyerName">Nombre completo</label>
+    <input type="text" id="buyerName" name="buyerName" placeholder="Ingresa tu nombre completo" required />
+    <label for="buyerEmail">Correo electrónico</label>
+    <input type="email" id="buyerEmail" name="buyerEmail" placeholder="Ingresa tu correo" required />
+    <label for="buyerAddress">Dirección de envío</label>
+    <input type="text" id="buyerAddress" name="buyerAddress" placeholder="Dirección" required />
+    <label for="paymentMethodIndividual">Método de pago</label>
+    <select id="paymentMethodIndividual" name="paymentMethodIndividual" required>
+      <option value="tarjeta">Tarjeta Débito/Crédito</option>
+      <option value="paypal">PayPal</option>
+    </select>
+    <div id="cardDetailsIndividual">
+      <label for="cardNumberIndividual">Número de tarjeta (16 dígitos)</label>
+      <input type="text" id="cardNumberIndividual" maxlength="16" pattern="\d{16}" placeholder="1234567812345678" required />
+      <label for="cvvIndividual">CVV</label>
+      <input type="text" id="cvvIndividual" maxlength="4" pattern="\d{3,4}" placeholder="123" required />
+      <label for="expiryIndividual">Fecha de vencimiento</label>
+      <input type="month" id="expiryIndividual" required />
+    </div>
+    <button type="submit">Realizar compra</button>
+  </form>
+</div>
+
+<!-- Modal carrito pago -->
+<div id="cartCheckoutModal">
+  <div id="cartCheckoutContent">
+    <button id="closeCartPayment" title="Cerrar">&times;</button>
+    <h2>Pago de Productos</h2>
+    <div id="cartProductsList"></div>
+    <form id="cartPaymentForm">
+      <label for="fullNameCart">Nombre completo</label>
+      <input type="text" id="fullNameCart" name="fullNameCart" placeholder="Tu nombre completo" required />
+      <label for="emailCart">Correo electrónico</label>
+      <input type="email" id="emailCart" name="emailCart" placeholder="Tu correo electrónico" required />
+      <label for="addressCart">Dirección de envío</label>
+      <input type="text" id="addressCart" name="addressCart" placeholder="Dirección" required />
+      <label for="paymentMethod">Método de pago</label>
+      <select id="paymentMethod" name="paymentMethod" required>
+        <option value="tarjeta">Tarjeta Débito/Crédito</option>
+        <option value="paypal">No disponible</option>
+      </select>
+      <div id="cardDetailsCart">
+        <label for="cardNumber">Número de tarjeta (16 dígitos)</label>
+        <input type="text" id="cardNumber" maxlength="16" pattern="\d{16}" placeholder="1234567812345678" required />
+        <label for="cvv">CVV</label>
+        <input type="text" id="cvv" maxlength="4" pattern="\d{3,4}" placeholder="123" required />
+        <label for="expiry">Fecha de vencimiento</label>
+        <input type="month" id="expiry" required />
+      </div>
+      <button type="submit">Pagar</button>
+    </form>
+  </div>
+</div>
+
+<!-- Mensaje añadido -->
+<div id="msgAdded">Se ha añadido al carrito</div>
+
+<footer>
+  &copy; 2025 NNSHOP Estilo. Todos los derechos reservados.
+</footer>
+
+<script>
+  // Navegación entre secciones
+  const links = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('section');
+  links.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = link.getAttribute('href').substring(1);
+      sections.forEach(sec => {
+        if (sec.id === target) sec.classList.add('active');
+        else sec.classList.remove('active');
+      });
+    });
+  });
+
+  // --- Modal de compra individual ---
+  const buyButtons = document.querySelectorAll('.buyBtn');
+  const formModal = document.getElementById('formModal');
+  const purchaseForm = document.getElementById('purchaseForm');
+  const closeFormBtn = document.getElementById('closeForm');
+  const sizeContainerIndividual = document.getElementById('sizeContainerIndividual');
+  const sizeIndividualSelect = document.getElementById('sizeIndividual');
+
+  function getSizesByType(type){
+    if(type === 'tenis'){
+      return ['23','24','25','26','27','28','29'];
+    } else if(type === 'camisa'){
+      return ['SM','S','M','L','G','XL','XXL'];
+    }
+    return [];
+  }
+
+  buyButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.product-card');
+      const name = card.getAttribute('data-name');
+      const price = card.getAttribute('data-price');
+      const type = card.getAttribute('data-type');
+
+      document.getElementById('productName').value = name;
+      document.getElementById('productPrice').value = `$${price} MXN`;
+
+      // Mostrar select de tamaño solo si aplica
+      const sizes = getSizesByType(type);
+      if(sizes.length > 0){
+        sizeContainerIndividual.style.display = 'block';
+        sizeIndividualSelect.innerHTML = '<option value="">Selecciona talla</option>';
+        sizes.forEach(size => {
+          const option = document.createElement('option');
+          option.value = size;
+          option.textContent = size;
+          sizeIndividualSelect.appendChild(option);
+        });
+        sizeIndividualSelect.required = true;
+      } else {
+        sizeContainerIndividual.style.display = 'none';
+        sizeIndividualSelect.innerHTML = '';
+        sizeIndividualSelect.required = false;
+      }
+
+      formModal.classList.add('active');
+    });
+  });
+  closeFormBtn.addEventListener('click', () => {
+    formModal.classList.remove('active');
+  });
+  formModal.addEventListener('click', (e) => {
+    if (e.target === formModal) formModal.classList.remove('active');
+  });
+
+  purchaseForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const buyerName = document.getElementById('buyerName').value;
+    const productName = document.getElementById('productName').value;
+    const productPrice = document.getElementById('productPrice').value;
+
+    let sizeSelected = '';
+    if (sizeIndividualSelect.required) {
+      sizeSelected = sizeIndividualSelect.value;
+      if (!sizeSelected) {
+        alert('Por favor selecciona una talla antes de comprar.');
+        return;
+      }
+      sizeSelected = `, Talla: ${sizeSelected}`;
+    }
+    alert(`¡Gracias ${buyerName}! Tu compra de "${productName}"${sizeSelected} por ${productPrice} fue recibida. ¡Recibirás datos del envío al correo proporcionado!`);
+    formModal.classList.remove('active');
+    purchaseForm.reset();
+  });
+
+  // --- Carrito de compra ---
+  const cart = [];
+  const cartCountSpan = document.getElementById('cartCount');
+  const cartItemsUl = document.getElementById('cartItems');
+  const cartIcon = document.getElementById('cartIcon');
+  const cartPanel = document.getElementById('cartPanel');
+  const buyAllBtn = document.getElementById('buyAllBtn');
+  const cartCheckoutModal = document.getElementById('cartCheckoutModal');
+  const cartProductsList = document.getElementById('cartProductsList');
+  const closeCartPaymentBtn = document.getElementById('closeCartPayment');
+
+  // Mensaje añadido
+  const msgAdded = document.getElementById('msgAdded');
+
+  const addToCartButtons = document.querySelectorAll('.addToCartBtn');
+  addToCartButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.product-card');
+      const name = card.getAttribute('data-name');
+      const price = card.getAttribute('data-price');
+      const type = card.getAttribute('data-type');
+
+      // Obtener talla seleccionada según tipo
+      let size;
+      if(type === 'tenis'){
+        const selectElem = card.querySelector('select.size-select');
+        size = selectElem ? selectElem.value : '';
+        if(!size){
+          alert('Por favor selecciona una talla para este tenis antes de añadir al carrito.');
+          return;
+        }
+      } else if(type === 'camisa'){
+        const selectElem = card.querySelector('select.size-select');
+        size = selectElem ? selectElem.value : '';
+        if(!size){
+          alert('Por favor selecciona una talla para esta camisa antes de añadir al carrito.');
+          return;
+        }
+      } else {
+        size = '';
+      }
+
+      cart.push({name, price, size, type});
+      actualizarCarrito();
+      mostrarMensajeAñadido();
+    });
+  });
+
+  function mostrarMensajeAñadido(){
+    msgAdded.style.opacity = '1';
+    msgAdded.style.pointerEvents = 'auto';
+    setTimeout(() => {
+      msgAdded.style.opacity = '0';
+      msgAdded.style.pointerEvents = 'none';
+    }, 2500);
+  }
+
+  cartIcon.addEventListener('click', () => {
+    if(cartPanel.style.display === 'block'){
+      cartPanel.style.display = 'none';
+    } else {
+      cartPanel.style.display = 'block';
+    }
+  });
+
+  function actualizarCarrito(){
+    cartCountSpan.textContent = cart.length;
+    cartItemsUl.innerHTML = '';
+    cart.forEach((item, index) => {
+      const li = document.createElement('li');
+      const sizeText = item.size ? `, Talla: ${item.size}` : '';
+      li.textContent = `${item.name}${sizeText} - $${item.price} MXN`;
+      const btnEliminar = document.createElement('button');
+      btnEliminar.textContent = 'Eliminar';
+      btnEliminar.onclick = () => {
+        cart.splice(index, 1);
+        actualizarCarrito();
+      };
+      li.appendChild(btnEliminar);
+      cartItemsUl.appendChild(li);
+    });
+  }
+
+  buyAllBtn.addEventListener('click', () => {
+    if(cart.length === 0){
+      alert('El carrito está vacío.');
+      return;
+    }
+    cartProductsList.innerHTML = '';
+    cart.forEach(item => {
+      const p = document.createElement('p');
+      const sizeText = item.size ? `, Talla: ${item.size}` : '';
+      p.textContent = `${item.name}${sizeText} - $${item.price} MXN`;
+      cartProductsList.appendChild(p);
+    });
+    cartCheckoutModal.classList.add('active');
+  });
+
+  closeCartPaymentBtn.addEventListener('click', () => {
+    cartCheckoutModal.classList.remove('active');
+  });
+  cartCheckoutModal.addEventListener('click', (e) => {
+    if(e.target === cartCheckoutModal) cartCheckoutModal.classList.remove('active');
+  });
+
+  const cartPaymentForm = document.getElementById('cartPaymentForm');
+  cartPaymentForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    // Validar datos de envio
+    const fullName = document.getElementById('fullNameCart').value.trim();
+    const email = document.getElementById('emailCart').value.trim();
+    const address = document.getElementById('addressCart').value.trim();
+
+    if (!fullName || !email || !address) {
+      alert('Por favor completa todos los datos de envío.');
+      return;
+    }
+
+    alert(`¡Pago realizado con éxito! Gracias por tu compra, ${fullName}. Recibiras datos del envio a el correo proporcionado ${email}.`);
+    cart.length = 0;
+    actualizarCarrito();
+    cartCheckoutModal.classList.remove('active');
+    cartPaymentForm.reset();
+  });
+</script>
+<script>
+  // Mostrar el formulario y hacer scroll suave al hacer click en el botón
+  document.getElementById("btnContactanos").addEventListener("click", function() {
+    const formSection = document.getElementById("formContacto");
+    formSection.style.display = "block";
+    formSection.scrollIntoView({ behavior: "smooth" });
+  });
+  
+  // Evitar que el formulario envíe datos (mock de submit)
+  document.querySelector("#formContacto form").addEventListener("submit", function(e){
+    e.preventDefault();
+    alert("Gracias por tu interés en contactarnos. Usa los medios indicados para comunicarte.");
+  });
+</script>
+</body>
+</html>
